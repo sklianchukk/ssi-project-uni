@@ -21,6 +21,13 @@ class BayesClassificator:
     #
     #
 
+    def GaussDistributionDensity(self, x, cls):
+        mean = self.statistics[cls].loc['mean']
+        std = self.statistics[cls].loc['std']
+        log_prefactor = -np.log(std * np.sqrt(2 * np.pi))
+        exponent_part = -pow(x - mean, 2) / (2 * pow(std, 2))
+        return log_prefactor + exponent_part
+
     def predict(self, unclfData):
         unclfData = unclfData.copy()
         
