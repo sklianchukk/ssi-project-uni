@@ -2,3 +2,5 @@
 prjssi
 __pycache__
 sleep_quality.csv
+columns_to_drop.csv
+sleepProcessed.csv
