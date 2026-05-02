@@ -53,7 +53,7 @@ class BayesClassificator:
 
     
     def predict(self, data):
-        data_unclassified = data.drop(columns=[self.cls])
+        data_unclassified = data.drop(columns=[self.cls], errors='ignore')
         data_predictions = data_unclassified.copy()
         
         for cls in self.classesOfAbstraction:
@@ -141,7 +141,7 @@ class BayesGuassianClassificator:
 
     def predict(self, unclfData):
         if self.cls in unclfData.columns:
-            unclfData = unclfData.drop(columns = [self.cls])
+            unclfData = unclfData.drop(columns = [self.cls], errors='ignore')
         clfData = unclfData.copy()
         for cls in self.statistics:
             log_prior = np.log(self.classLength[cls] / self.totalSamples)
