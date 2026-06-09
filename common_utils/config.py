@@ -9,3 +9,5 @@ NUMERIC_FEATURES = [
     "Heart Rate",
     "Daily Steps",
 ]
+
+TARGET_COLUMN = "Sleep Disorder"

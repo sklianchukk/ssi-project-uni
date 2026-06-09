@@ -3,12 +3,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
-from config import CATEGORICAL_FEATURES, NUMERIC_FEATURES
+from common_utils.config import CATEGORICAL_FEATURES, NUMERIC_FEATURES
 
 
 def create_preprocessor() -> ColumnTransformer:
-    """Creates a column transformer for categorical and numeric features."""
-    # define categorical transformation logic
+    """Create column transformer for categorical and numeric features."""
     return ColumnTransformer(
         transformers=[
             (
@@ -17,14 +16,12 @@ def create_preprocessor() -> ColumnTransformer:
                 CATEGORICAL_FEATURES,
             )
         ],
-        # leave numeric columns unchanged
         remainder="passthrough",
     )
 
 
 def create_pipeline(preprocessor: ColumnTransformer) -> Pipeline:
-    """Creates a pipeline with preprocessor and random forest classifier."""
-    # construct pipeline to prevent data leakage during cross-validation
+    """Create pipeline with preprocessor and Random Forest classifier."""
     return Pipeline(
         steps=[
             ("preprocessor", preprocessor),
@@ -39,11 +36,10 @@ def create_pipeline(preprocessor: ColumnTransformer) -> Pipeline:
 
 
 def get_feature_importances(pipeline: Pipeline) -> tuple:
-    """Extracts feature names and importance scores from trained pipeline."""
-    # access the underlying random forest model
+    """Extract feature names and importance scores from trained pipeline."""
     rf_model = pipeline.named_steps["classifier"]
 
-    # extract dynamically generated column names from the encoder
+    # Extract feature names from encoder
     cat_feature_names = (
         pipeline.named_steps["preprocessor"]
         .transformers_[0][1]
@@ -53,7 +49,7 @@ def get_feature_importances(pipeline: Pipeline) -> tuple:
     all_feature_names = list(cat_feature_names) + NUMERIC_FEATURES
     importances = rf_model.feature_importances_
 
-    # sort indices based on importance scores in descending order
+    # Sort by importance
     indices = np.argsort(importances)[::-1]
 
     return all_feature_names, importances, indices
