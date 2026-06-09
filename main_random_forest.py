@@ -24,6 +24,7 @@ from common_utils.evaluation_utils import (
     plot_confusion_matrix,
     print_feature_importances,
     plot_feature_importances,
+    print_gridsearch_results,
 )
 from random_forest_model.pipeline import create_preprocessor, create_pipeline, get_feature_importances
 
@@ -78,7 +79,7 @@ def train_and_evaluate(df: pd.DataFrame, binary: bool = False) -> None:
     )
     grid_search.fit(X, y)
 
-    print(f"Best Parameters: {grid_search.best_params_}")
+    print_gridsearch_results(grid_search, top_n=5)
     best_pipeline = grid_search.best_estimator_
 
     # Cross-validation evaluation

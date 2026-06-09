@@ -116,3 +116,39 @@ def plot_feature_importances(
     plt.savefig(filename, dpi=300)
     plt.show(block=False)
     plt.pause(1)
+
+
+def print_gridsearch_results(grid_search_obj, top_n: int = 5) -> None:
+    """Print GridSearchCV results with best parameters and top configurations."""
+    print("\n" + "=" * 70)
+    print("GRIDSEARCH OPTIMIZATION RESULTS")
+    print("=" * 70)
+
+    # Best parameters and score
+    print(f"\nBest F1-Score (weighted): {grid_search_obj.best_score_:.4f}")
+    print("\nBest Parameter Combination:")
+    print("-" * 70)
+    for param_name, param_value in grid_search_obj.best_params_.items():
+        clean_name = param_name.replace("classifier__", "")
+        print(f"  {clean_name:<30} {param_value}")
+
+    # Top configurations
+    results_df = pd.DataFrame(grid_search_obj.cv_results_)
+    results_df["rank"] = results_df["rank_test_score"]
+
+    print(f"\nTop {min(top_n, len(results_df))} Parameter Combinations:")
+    print("-" * 70)
+
+    top_results = results_df.nsmallest(top_n, "rank_test_score")
+
+    for idx, (_, row) in enumerate(top_results.iterrows(), 1):
+        print(f"\n#{idx} - F1-Score: {row['mean_test_score']:.4f} " f"(±{row['std_test_score']:.4f})")
+
+        # Extract and print parameters
+        param_keys = [k for k in results_df.columns if k.startswith("param_")]
+        for param_key in sorted(param_keys):
+            if pd.notna(row[param_key]):
+                clean_name = param_key.replace("param_classifier__", "")
+                print(f"     {clean_name:<28} {row[param_key]}")
+
+    print("\n" + "=" * 70)
