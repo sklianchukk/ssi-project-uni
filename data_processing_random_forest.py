@@ -44,4 +44,3 @@ def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
     df_data = df_data.drop("Blood Pressure", axis=1)
 
     return df_data
-
