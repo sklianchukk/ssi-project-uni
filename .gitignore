@@ -8,3 +8,6 @@ sleepProcessed.csv
 Sleep_health_and_lifestyle_dataset.csv
 SSI_project.pdf
 Images
+Evaluation_images
+sleep_processed_rf.csv
+sleep_processed_bayes.csv
