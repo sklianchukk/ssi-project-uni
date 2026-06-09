@@ -5,6 +5,7 @@ Tests both KDE-based and Gaussian-based Naive Bayes classifiers on multiclass
 and binary classification tasks with stratified k-fold cross-validation.
 """
 
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +13,11 @@ from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from sklearn.metrics import confusion_matrix, classification_report, ConfusionMatrixDisplay
 
 from common_utils.data_processing import load_dataset, preprocess_data_basic
-from common_utils.evaluation_utils import plot_class_distribution, plot_correlation_matrix
+from common_utils.evaluation_utils import (
+    ensure_output_folder,
+    plot_class_distribution,
+    plot_correlation_matrix,
+)
 from bayes_model.sklearn_wrapper import BayesSklearnWrapper
 from bayes_model.classifier import BayesClassifier, BayesGaussianClassifier
 
@@ -23,6 +28,8 @@ def evaluate_classifier(
     classifier,
     cv_splits: int = 5,
     title: str = "Classification Report",
+    folder: str = None,
+    filename: str = "confusion_matrix.png",
 ) -> None:
     """
     Train and evaluate classifier using stratified k-fold cross-validation.
@@ -33,6 +40,8 @@ def evaluate_classifier(
         classifier: Classifier instance.
         cv_splits: Number of cross-validation splits.
         title: Title for the evaluation output.
+        folder: Folder to save confusion matrix PNG.
+        filename: Filename for confusion matrix PNG.
     """
     print(f"\n{'=' * 60}")
     print(title)
@@ -77,12 +86,20 @@ def evaluate_classifier(
     disp.plot(cmap=plt.cm.Blues)
     plt.title(title)
     plt.tight_layout()
+
+    if folder:
+        filepath = os.path.join(folder, filename)
+        plt.savefig(filepath, dpi=300)
+
     plt.show(block=False)
     plt.pause(1)
 
 
 def main():
     """Main training pipeline."""
+    # Create output folder
+    output_folder = ensure_output_folder("Evaluation_images")
+
     # Load and preprocess data
     print("Loading dataset...")
     df_raw = load_dataset("sleep_quality.csv")
@@ -93,8 +110,10 @@ def main():
     print(f"Processed dataset saved: {len(df_processed)} samples")
 
     # Exploratory visualizations
-    plot_class_distribution(df_processed)
-    plot_correlation_matrix(df_processed, exclude_cols=["Person ID", "Sleep Disorder"])
+    plot_class_distribution(df_processed, folder=output_folder)
+    plot_correlation_matrix(
+        df_processed, exclude_cols=["Person ID", "Sleep Disorder"], folder=output_folder
+    )
 
     # KDE-based Naive Bayes - Multiclass
     print("\n" + "=" * 60)
@@ -107,6 +126,8 @@ def main():
         "Sleep Disorder",
         bayes_kde,
         title="KDE Bayes - Multiclass Classification",
+        folder=output_folder,
+        filename="confusion_matrix_bayes_kde_multiclass.png",
     )
 
     # Binary classification
@@ -122,6 +143,8 @@ def main():
         "Sleep Disorder",
         BayesClassifier(),
         title="KDE Bayes - Binary Classification (Disorder vs No Disorder)",
+        folder=output_folder,
+        filename="confusion_matrix_bayes_kde_binary.png",
     )
 
     # Gaussian-based Naive Bayes
@@ -135,6 +158,8 @@ def main():
         "Sleep Disorder",
         bayes_gaussian,
         title="Gaussian Bayes - Multiclass Classification",
+        folder=output_folder,
+        filename="confusion_matrix_bayes_gaussian_multiclass.png",
     )
 
     # Gaussian Bayes - Binary classification
@@ -143,6 +168,8 @@ def main():
         "Sleep Disorder",
         BayesGaussianClassifier(),
         title="Gaussian Bayes - Binary Classification (Disorder vs No Disorder)",
+        folder=output_folder,
+        filename="confusion_matrix_bayes_gaussian_binary.png",
     )
 
     plt.show()

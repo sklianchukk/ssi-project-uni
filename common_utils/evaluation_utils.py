@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -5,7 +6,14 @@ import seaborn as sns
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report
 
 
-def plot_class_distribution(df: pd.DataFrame, target_column: str = "Sleep Disorder") -> None:
+def ensure_output_folder(folder_path: str = "Evaluation_images") -> str:
+    """Create output folder if it doesn't exist."""
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+    return folder_path
+
+
+def plot_class_distribution(df: pd.DataFrame, target_column: str = "Sleep Disorder", folder: str = None) -> None:
     """Plot and save class distribution chart."""
     plt.figure(figsize=(8, 6))
     sns.countplot(data=df, x=target_column, palette="Set2")
@@ -13,12 +21,16 @@ def plot_class_distribution(df: pd.DataFrame, target_column: str = "Sleep Disord
     plt.xlabel("Sleep Disorder Category")
     plt.ylabel("Count")
     plt.tight_layout()
-    plt.savefig("class_distribution.png", dpi=300)
+
+    if folder:
+        filepath = os.path.join(folder, "class_distribution.png")
+        plt.savefig(filepath, dpi=300)
+
     plt.show(block=False)
     plt.pause(1)
 
 
-def plot_correlation_matrix(df: pd.DataFrame, exclude_cols: list = None) -> None:
+def plot_correlation_matrix(df: pd.DataFrame, exclude_cols: list = None, folder: str = None) -> None:
     """Plot correlation heatmap for numeric features."""
     numeric_df = df.select_dtypes(include=[np.number])
     if exclude_cols:
@@ -28,6 +40,11 @@ def plot_correlation_matrix(df: pd.DataFrame, exclude_cols: list = None) -> None
     sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm", fmt=".2f")
     plt.title("Correlation Matrix")
     plt.tight_layout()
+
+    if folder:
+        filepath = os.path.join(folder, "correlation_matrix.png")
+        plt.savefig(filepath, dpi=300)
+
     plt.show(block=False)
     plt.pause(1)
 
@@ -63,6 +80,7 @@ def plot_confusion_matrix(
     title: str = "Confusion Matrix",
     display_labels: list = None,
     rotation: int = 45,
+    folder: str = None,
 ) -> None:
     """Plot and save confusion matrix."""
     ConfusionMatrixDisplay.from_predictions(
@@ -74,7 +92,13 @@ def plot_confusion_matrix(
     )
     plt.title(title)
     plt.tight_layout()
-    plt.savefig(filename, dpi=300)
+
+    if folder:
+        filepath = os.path.join(folder, filename)
+        plt.savefig(filepath, dpi=300)
+    else:
+        plt.savefig(filename, dpi=300)
+
     plt.show(block=False)
     plt.pause(1)
 
@@ -102,6 +126,7 @@ def plot_feature_importances(
     filename: str = "feature_importance.png",
     title: str = "Top Feature Importances",
     top_n: int = 8,
+    folder: str = None,
 ) -> None:
     """Plot and save feature importances."""
     plt.figure(figsize=(10, 6))
@@ -113,7 +138,13 @@ def plot_feature_importances(
     plt.title(title)
     plt.xlabel("Mean Decrease in Impurity")
     plt.tight_layout()
-    plt.savefig(filename, dpi=300)
+
+    if folder:
+        filepath = os.path.join(folder, filename)
+        plt.savefig(filepath, dpi=300)
+    else:
+        plt.savefig(filename, dpi=300)
+
     plt.show(block=False)
     plt.pause(1)
 
